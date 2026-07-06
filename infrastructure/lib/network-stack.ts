@@ -15,7 +15,24 @@ export class NetworkStack extends cdk.Stack {
     // VPC
     this.vpc = new ec2.Vpc(this, 'LibraryVpc', {
       maxAzs: 2,
-      natGateways: 1, // Required for private subnets to access the internet (e.g. for Secrets Manager API if no endpoint)
+      natGateways: 1, // Needed if Lambdas in private with egress need internet (e.g. SES)
+      subnetConfiguration: [
+        {
+          cidrMask: 24,
+          name: 'Public',
+          subnetType: ec2.SubnetType.PUBLIC,
+        },
+        {
+          cidrMask: 24,
+          name: 'PrivateEgress',
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS, // For Lambdas & Proxy
+        },
+        {
+          cidrMask: 24,
+          name: 'PrivateIsolated',
+          subnetType: ec2.SubnetType.PRIVATE_ISOLATED, // For RDS
+        }
+      ]
     });
 
     // Lambda Security Group
@@ -31,12 +48,5 @@ export class NetworkStack extends cdk.Stack {
       description: 'Security group for RDS Proxy and RDS Database',
       allowAllOutbound: true,
     });
-
-    // Allow Lambda to access Database Security Group
-    this.databaseSecurityGroup.addIngressRule(
-      this.lambdaSecurityGroup,
-      ec2.Port.tcp(5432),
-      'Allow PostgreSQL access from Lambda'
-    );
   }
 }

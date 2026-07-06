@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: library-backend
+  
+  datasource:
+    # URL and credentials will be injected via environment variables defined by AWS Secrets Manager / CDK in production.
+    # Defaults are for local testing or CI overrides.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/librarydb}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+logging:
+  level:
+    root: INFO
+    com.library: DEBUG
+    org.springframework.data.jdbc: DEBUG

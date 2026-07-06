@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    
+    <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- Ensure timestamps are easily parseable by CloudWatch -->
+            <fieldNames>
+                <timestamp>time</timestamp>
+            </fieldNames>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="jsonConsoleAppender"/>
+    </root>
+
+    <!-- Detailed logging for our application -->
+    <logger name="com.library" level="DEBUG" />
+    <logger name="org.springframework.data.jdbc" level="DEBUG" />
+</configuration>
